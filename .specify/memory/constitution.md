@@ -1,50 +1,83 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+Version change: unresolved template → 1.0.0 (initial project-specific constitution)
+Modified principles: unresolved template placeholders → five project-specific principles
+Added sections: Project Constraints; Development Workflow and Quality Gates
+Removed sections: none
+Follow-up TODOs: Confirm the original ratification date.
+-->
+
+# RSS Feed Reader Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Security and Trust Boundaries
+All application inputs and feed content MUST be treated as untrusted. The MVP MUST NOT
+fetch remote feeds or store secrets in source control. Input checks MUST match the
+documented MVP scope, which accepts feed URLs without URL validation. When remote
+fetching is approved for a later phase, requests MUST be limited to HTTP or HTTPS and
+must prevent access to loopback, private, link-local, and cloud metadata destinations,
+including after redirects. Errors shown to users MUST NOT disclose secrets or
+implementation details.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Maintainable Separation of Responsibilities
+The ASP.NET Core Web API MUST own subscription data and API behavior; the Blazor
+WebAssembly frontend MUST own user interaction and presentation. API contracts MUST be
+explicit and kept consistent across both layers. New code MUST follow existing project
+patterns and avoid abstractions that do not support a documented requirement.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Verified Behavior and Code Quality
+Changes MUST include or update automated tests for the behavior they add or alter.
+Subscription changes MUST verify that adding a subscription updates the list returned
+to the UI. Changes to API/frontend integration MUST verify the affected contract and
+communication path. Before a change is considered complete, the affected projects
+MUST build successfully and relevant tests MUST pass.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. MVP Scope and Incremental Delivery
+The MVP is limited to adding feed subscriptions by URL and displaying the subscription
+list. It MUST use in-memory storage and MUST NOT fetch or parse feeds, persist data,
+remove subscriptions, or add background polling. Features outside this scope require
+an explicitly approved specification before implementation. Later phases MUST add
+capabilities incrementally without silently changing MVP behavior.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Clear and Safe User Feedback
+The UI MUST reflect successful subscription changes immediately. Operations that can
+fail MUST return an appropriate API outcome and provide a clear, safe user-facing
+message; diagnostic detail belongs in appropriate application logs, not in messages
+exposed to users. The MVP has no network feed operations, so feed-fetch error handling
+is required only when that capability is approved and implemented.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Project Constraints
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+The supported application architecture is an ASP.NET Core Web API backend with a
+Blazor WebAssembly frontend, written in C#. The application MUST remain cross-platform
+for local development on Windows, macOS, and Linux. The backend and frontend MUST
+retain their defined responsibilities. A technology or architecture change MUST be
+justified by a documented project requirement and reflected in the relevant project
+documentation.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Development Workflow and Quality Gates
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+For changes that affect application behavior, developers MUST run the relevant
+automated tests and build the affected backend and/or frontend projects. Changes to
+API/frontend communication MUST also be checked against the configured backend URL
+and CORS policy, and smoke-tested through the affected user flow when practical.
+Reviews MUST confirm that the change stays within the approved feature scope,
+preserves the API contract, and complies with the security and testing principles.
+Any necessary exception MUST be documented with its rationale and scope.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution governs project implementation and review. Amendments MUST be
+documented in this file, reviewed for impact on existing work, and reflected in the
+constitution version and last-amended date. The version follows semantic versioning:
+MAJOR for incompatible governance changes, MINOR for new or materially expanded
+principles or sections, and PATCH for clarifications and other non-semantic changes.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Each implementation and review MUST check applicable requirements in this
+constitution. Any deviation MUST be explicit, justified, and approved as part of the
+change review. When requirements conflict, the narrower approved feature scope and
+security constraints take precedence; unresolved conflicts MUST be settled before
+implementation.
+
+**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2026-10-19
