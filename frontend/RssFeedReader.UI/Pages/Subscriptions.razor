@@ -1,0 +1,112 @@
+@page "/"
+@using RssFeedReader.UI.Services
+@inject SubscriptionsApiClient SubscriptionsApiClient
+
+<PageTitle>Subscriptions</PageTitle>
+
+<h1>Feed subscriptions</h1>
+
+<div class="d-flex flex-column gap-2 mb-3">
+    <label for="subscriptionUrl">Feed URL</label>
+    <input id="subscriptionUrl" class="form-control" @bind="_newUrl" placeholder="https://example.test/feed.xml" />
+    <div class="d-flex gap-2 align-items-center">
+        <button class="btn btn-primary" type="button" @onclick="SubmitAsync" disabled="@_isSubmitting">
+            @_submitButtonText
+        </button>
+        @if (!string.IsNullOrWhiteSpace(_errorMessage))
+        {
+            <span class="text-danger">@_errorMessage</span>
+        }
+        @if (!string.IsNullOrWhiteSpace(_successMessage))
+        {
+            <span class="text-success">@_successMessage</span>
+        }
+    </div>
+</div>
+
+@if (_isLoading)
+{
+    <p>Loading subscriptions...</p>
+}
+else if (_subscriptions.Count == 0)
+{
+    <p>No subscriptions yet.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var item in _subscriptions)
+        {
+            <li class="list-group-item">@item.Url</li>
+        }
+    </ul>
+}
+
+@code {
+    private readonly List<FeedSubscription> _subscriptions = new();
+    private string _newUrl = string.Empty;
+    private string? _errorMessage;
+    private string? _successMessage;
+    private bool _isLoading;
+    private bool _isSubmitting;
+
+    private string _submitButtonText => _isSubmitting ? "Adding..." : "Add subscription";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSubscriptionsAsync();
+    }
+
+    private async Task LoadSubscriptionsAsync()
+    {
+        _isLoading = true;
+        try
+        {
+            var subscriptions = await SubscriptionsApiClient.GetSubscriptionsAsync();
+            _subscriptions.Clear();
+            foreach (var item in subscriptions)
+            {
+                _subscriptions.Add(item);
+            }
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        _errorMessage = null;
+        _successMessage = null;
+
+        if (string.IsNullOrWhiteSpace(_newUrl))
+        {
+            _errorMessage = "Please enter a subscription URL.";
+            return;
+        }
+
+        _isSubmitting = true;
+        try
+        {
+            var subscription = await SubscriptionsApiClient.AddSubscriptionAsync(_newUrl);
+            if (subscription is null)
+            {
+                _errorMessage = "The URL could not be added. Please try again.";
+                return;
+            }
+
+            _newUrl = string.Empty;
+            _successMessage = $"Added: {subscription.Url}";
+            await LoadSubscriptionsAsync();
+        }
+        catch
+        {
+            _errorMessage = "Unable to contact the API right now.";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+}

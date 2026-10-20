@@ -1,0 +1,30 @@
+## .NET / ASP.NET Core
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+*.db
+*.db-shm
+*.db-wal
+
+## Visual Studio
+.vs/
+*.code-workspace
+*.tmp
+*.swp
+*.sln.ide
+
+## Node / frontend tooling (if used locally)
+node_modules/
+package-lock.json
+
+## OS / editor noise
+.DS_Store
+Thumbs.db

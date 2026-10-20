@@ -1,0 +1,80 @@
+openapi: 3.0.3
+info:
+  title: RSS Feed Reader Subscriptions API
+  version: 1.0.0
+  description: In-memory subscription list for the single-user MVP.
+paths:
+  /api/subscriptions:
+    get:
+      summary: List subscriptions
+      operationId: listSubscriptions
+      responses:
+        "200":
+          description: Subscriptions in insertion order; an empty list is returned when none exist.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FeedSubscription"
+              example:
+                - url: https://example.test/feed.xml
+    post:
+      summary: Add a subscription
+      operationId: addSubscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddSubscriptionRequest"
+            example:
+              url: https://example.test/feed.xml
+      responses:
+        "201":
+          description: A new subscription was added.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeedSubscription"
+        "200":
+          description: That exact URL was already present; no duplicate was added.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeedSubscription"
+        "400":
+          description: The request body is missing or the URL is null, empty, or whitespace-only.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+components:
+  schemas:
+    AddSubscriptionRequest:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          description: Accepted as supplied; it is not validated, normalized, or fetched.
+          minLength: 1
+          pattern: '\S'
+    FeedSubscription:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          description: Exact submitted URL string.
+    ProblemDetails:
+      type: object
+      description: Safe client-facing details for an invalid request.
+      properties:
+        title:
+          type: string
+        status:
+          type: integer
+          example: 400
