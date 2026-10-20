@@ -1,13 +1,13 @@
 # Quickstart: MVP Feed Subscriptions
 
 This guide validates the feature after its implementation projects have been created.
-Commands use the proposed project paths in `plan.md`.
+Commands use the project paths in `plan.md`.
 
 ## Prerequisites
 
 - .NET 10 SDK installed.
 - A supported desktop browser.
-- The repository's API and Blazor UI projects created as described in `plan.md`.
+- The API and Blazor UI projects in this repository.
 
 ## Build and automated tests
 
@@ -38,9 +38,8 @@ In a second terminal, start the browser UI:
 dotnet run --project frontend/RssFeedReader.UI
 ```
 
-Open the browser address printed by the UI process. The configured API base address
-must point at the running API, and the API's local CORS policy must permit the UI's
-development origin.
+Open the browser address printed by the UI process. The API base address is configured as `http://localhost:5173`, and the API's local
+CORS policy permits the UI's development origin at `http://localhost:5287`.
 
 ## Verify through the UI
 
@@ -58,7 +57,7 @@ development origin.
 Set `$apiBase` to the address printed by the API process, then run:
 
 ```powershell
-$apiBase = 'http://localhost:5000'
+$apiBase = 'http://localhost:5173'
 Invoke-RestMethod -Uri "$apiBase/api/subscriptions" -Method Get
 Invoke-RestMethod -Uri "$apiBase/api/subscriptions" -Method Post `
   -ContentType 'application/json' `
@@ -72,5 +71,4 @@ Invoke-RestMethod -Uri "$apiBase/api/subscriptions" -Method Get
 Expected: GET returns an empty JSON array before adding and a one-entry array
 afterward; the first POST returns the created subscription and the repeated POST
 returns the existing subscription without adding another row. A whitespace-only
-URL returns HTTP 400. Replace port `5000` with the actual configured API address if
-needed.
+URL returns HTTP 400. Update `$apiBase` if you have changed the API launch address.
